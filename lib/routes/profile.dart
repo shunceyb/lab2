@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:print_space/auth.dart';
+import 'package:print_space/routes/layout.dart';
+import 'package:print_space/signin.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -6,127 +9,136 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
-        title: Text('Profile', style: TextStyle(fontSize: 32)),
-        // backgroundColor: Color(0xff86c8f7),
+        title: const Text(
+          'Profile',
+          style: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+            color: Colors.purple,
+          ),
+        ),
+        centerTitle: true,
+        backgroundColor: Colors.white,
+        elevation: 2,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(18)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              try {
+                AuthService.signOut();
+              } finally {
+                Navigator.of(context).pushReplacement(
+                  MaterialPageRoute(builder: (context) => SignInScreen()),
+                );
+              }
+            },
+            child: const Text(
+              'Sign Out',
+              style: TextStyle(
+                color: Colors.purple,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
-          spacing: 20,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+            // Profile section without Card
+            Column(
               children: [
-                Column(
-                  children: [
-                    CircleAvatar(
-                      radius: MediaQuery.of(context).size.width * .15,
-                      // borderRadius: BorderRadiusGeometry.circular(144),
-                      foregroundImage: AssetImage('assets/images/profile.png'),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          Text('Shuncey', style: TextStyle(fontSize: 24)),
-                          Text('I-BIT KMUTNB'),
-                        ],
-                      ),
-                    ),
-                  ],
+                CircleAvatar(
+                  radius: 48,
+                  foregroundImage: const AssetImage(
+                    'assets/images/profile.png',
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Name: ${AuthService.getCurrentUser()?.displayName ?? 'No Name'}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.purple,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Email: ${AuthService.getCurrentUser()?.email ?? 'No Email'}',
+                  style: TextStyle(fontSize: 16, color: Color(0xFF666666)),
                 ),
               ],
             ),
-            Text('I print useless stuff'),
+            const SizedBox(height: 18),
             Row(
-              spacing: 10,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Column(
-                  children: [
-                    Text(
-                      '67',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('Following'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(
-                      '0',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('Followers'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(
-                      '1',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('Favorited'),
-                  ],
-                ),
-                Column(
-                  children: [
-                    Text(
-                      '3',
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text('Prints'),
-                  ],
-                ),
+                _buildStatCard('67', 'Following'),
+                _buildStatCard('0', 'Followers'),
+                _buildStatCard('1', 'Favorited'),
+                _buildStatCard('3', 'Prints'),
               ],
             ),
+            const SizedBox(height: 18),
             Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 10,
-                  crossAxisSpacing: 10,
-                  children: [
-                    Image.asset(
-                      'assets/images/elderflame.webp',
-                      // width: MediaQuery.of(context).size.width * 0.45,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    Image.asset(
-                      'assets/images/flash.webp',
-                      // width: MediaQuery.of(context).size.width * 0.45,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    Image.asset(
-                      'assets/images/vase.webp',
-                      // width: MediaQuery.of(context).size.width * 0.45,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                  ],
-                ),
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
+                children: [
+                  _buildPrintCard('assets/images/elderflame.webp'),
+                  _buildPrintCard('assets/images/flash.webp'),
+                  _buildPrintCard('assets/images/vase.webp'),
+                ],
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatCard(String value, String label) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Column(
+          children: [
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.purple,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 13, color: Color(0xFF666666)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPrintCard(String imagePath) {
+    return Card(
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Image.asset(imagePath, fit: BoxFit.cover),
       ),
     );
   }

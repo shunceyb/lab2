@@ -1,19 +1,38 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:print_space/auth.dart';
 import 'package:print_space/routes/favorite.dart';
 import 'package:print_space/routes/home.dart';
+import 'package:print_space/routes/layout.dart';
 import 'package:print_space/routes/profile.dart';
+import 'package:print_space/signin.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final isLoggedIn = AuthService.isSignedIn();
+
   final prefs = await SharedPreferences.getInstance();
-  runApp(MyApp(showOnboarding: prefs.getBool('ON_BOARDING') ?? true));
+  runApp(
+    MyApp(
+      showOnboarding: prefs.getBool('ON_BOARDING') ?? true,
+      isLoggedIn: isLoggedIn,
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
   final bool showOnboarding;
-  const MyApp({super.key, required this.showOnboarding});
+  final bool isLoggedIn;
+  const MyApp({
+    super.key,
+    required this.showOnboarding,
+    required this.isLoggedIn,
+  });
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -22,14 +41,14 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   int currentRoute = 0;
   bool showOnboardingScreen = false;
+  bool isLoggedIn = false;
 
   @override
   void initState() {
     showOnboardingScreen = widget.showOnboarding;
+    isLoggedIn = widget.isLoggedIn;
     super.initState();
   }
-
-  var routes = [HomeScreen(), FavoriteScreen(), ProfileScreen()];
 
   Future<void> dismiss() async {
     final prefs = await SharedPreferences.getInstance();
@@ -133,21 +152,7 @@ class _MyAppState extends State<MyApp> {
                 onSkip: () => dismiss(),
               ),
             )
-          : Scaffold(
-              bottomNavigationBar: CurvedNavigationBar(
-                items: [
-                  Icon(Icons.home, color: Colors.white),
-                  Icon(Icons.star, color: Colors.white),
-                  Icon(Icons.person, color: Colors.white),
-                ],
-                onTap: (index) => setState(() => currentRoute = index),
-                animationDuration: Duration(milliseconds: 250),
-                // backgroundColor: Color(0xff86c8f7),
-                backgroundColor: Colors.white,
-                color: Color(0xff063d6b),
-              ),
-              body: routes[currentRoute],
-            ),
+          : (isLoggedIn ? Layout() : SignInScreen()),
     );
   }
 }
