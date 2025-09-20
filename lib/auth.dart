@@ -1,21 +1,19 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class AuthService {
   static final _auth = FirebaseAuth.instance;
-  static final _googleSignIn = kIsWeb
-      ? GoogleSignIn(
-          scopes: ['email', 'profile'],
-          clientId:
-              '444538853268-ldoq24j10cdd1cj9uvatnsefds30aqi3.apps.googleusercontent.com',
-        )
-      : GoogleSignIn(
-          scopes: ['email', 'profile'],
-          serverClientId:
-              '444538853268-ldoq24j10cdd1cj9uvatnsefds30aqi3.apps.googleusercontent.com',
-        );
+  static final _googleSignIn = GoogleSignIn.instance;
+
+  AuthService() {
+    _googleSignIn.initialize(
+      clientId:
+          "444538853268-u05kgcuv87av83a9ls1k01kr9h2si7kt.apps.googleusercontent.com",
+      serverClientId:
+          "444538853268-2v6b5b5f4j3q1r5i4g7t8u1f3b0v4j6k.apps.googleusercontent.com",
+    );
+  }
 
   /// Get current user
   static User? getCurrentUser() => _auth.currentUser;
@@ -67,14 +65,13 @@ class AuthService {
   static Future<UserCredential?> signInWithGoogle() async {
     try {
       await _googleSignIn.signOut();
-      final googleUser = await _googleSignIn.signIn();
+      final googleUser = await _googleSignIn.authenticate();
       if (googleUser == null) throw Exception('Google sign in was cancelled');
       final googleAuth = await googleUser.authentication;
-      if (googleAuth.accessToken == null || googleAuth.idToken == null) {
+      if (googleAuth.idToken == null) {
         throw Exception('Failed to get Google authentication tokens');
       }
       final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
       final result = await _auth.signInWithCredential(credential);

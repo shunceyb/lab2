@@ -14,7 +14,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "444538853268-ldoq24j10cdd1cj9uvatnsefds30aqi3.apps.googleusercontent.com",
+          "client_id": "444538853268-u05kgcuv87av83a9ls1k01kr9h2si7kt.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -29,6 +29,13 @@
             {
               "client_id": "444538853268-ldoq24j10cdd1cj9uvatnsefds30aqi3.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "444538853268-4ggb16bf2r18s8g1usqk37un6cjko16g.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.printSpace"
+              }
             }
           ]
         }
